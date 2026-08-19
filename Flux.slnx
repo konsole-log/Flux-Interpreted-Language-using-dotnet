@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Flux.CLI/Flux.CLI.csproj" />
+  <Project Path="Flux.Language/Flux.Language.csproj" />
+</Solution>
