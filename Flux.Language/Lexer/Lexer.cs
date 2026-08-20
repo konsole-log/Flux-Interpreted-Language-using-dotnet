@@ -1,5 +1,5 @@
-namespace Flux.Language.Lexer
-{
+namespace Flux.Language.Lexer;
+
     public class Lexer
     {
         public void Test()
@@ -7,4 +7,4 @@ namespace Flux.Language.Lexer
             Console.WriteLine("Flux lexer");
         }
     }
-}
+
