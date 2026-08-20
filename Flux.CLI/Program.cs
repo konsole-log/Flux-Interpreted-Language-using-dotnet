@@ -1,9 +1,10 @@
-﻿// using Flux.Language.Lexer;
+﻿using Flux.Language.Lexer;
+
 namespace Flux.CLI;
 
 public class Flux
 {
-    static bool hadError = false;
+
     public static void Main(string[] args)
     {
         if (args.Length > 1)
@@ -23,8 +24,9 @@ public class Flux
 
     private static void RunFile(string path)
     {
-       Run(File.ReadAllText(path));
-       if(hadError) Environment.Exit(65);
+        Run(File.ReadAllText(path));
+        if (ErrorReporter.hadError)
+            Environment.Exit(65);
     }
 
     private static void RunPrompt()
@@ -42,18 +44,17 @@ public class Flux
                 break;
             }
             Run(input);
-            hadError=false;
-        }
+            ErrorReporter.hadError = false;
+    }
     }
 
-    private static void Run(string source) { 
+    private static void Run(string source)
+    {
         //lexer code goes here
-    }
-    static void Error(int line, string message){
-        Report(line,"",message);
-    }
-    private static void Report(int line, string position, string message){
-        Console.Error.WriteLine($"[Line {line} Error {position} :{message}]");
-        hadError=true;
+        Lexer lexer = new(source);
+        List<Token> tokens = lexer.ScanTokens();
+        foreach(Token token in tokens){
+            Console.WriteLine(token);
+        }
     }
 }
