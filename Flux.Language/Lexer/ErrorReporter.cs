@@ -6,7 +6,6 @@ public class ErrorReporter
 
     public static void Error(int line, string message)
     {
-        Console.WriteLine(hadError);
         Report(line, "", message);
     }
 

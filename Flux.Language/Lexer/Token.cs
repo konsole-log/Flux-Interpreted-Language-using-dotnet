@@ -17,6 +17,6 @@ public class Token
 
     public override string ToString()
     {
-        return $"{this.type}\t{this.lexeme}\t{this.literal}";
+        return $"Type:{this.type,-15} Lexeme: {this.lexeme,-10} Literal: {this.literal,-10}";
     }
 }

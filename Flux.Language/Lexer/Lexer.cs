@@ -9,6 +9,27 @@ public class Lexer
     private int start = 0;
     private int current = 0;
     private int line = 1;
+    private static readonly Dictionary<string, TokenType> keywords = new Dictionary<
+        string,
+        TokenType
+    >()
+    {
+        { "and", TokenType.AND },
+        { "class", TokenType.CLASS },
+        { "else", TokenType.ELSE },
+        { "false", TokenType.FALSE },
+        { "for", TokenType.FOR },
+        { "func", TokenType.FUN },
+        { "if", TokenType.IF },
+        { "nil", TokenType.NIL },
+        { "or", TokenType.OR },
+        { "print", TokenType.PRINT },
+        { "return", TokenType.RETURN },
+        { "parent", TokenType.PARENT },
+        { "this", TokenType.THIS },
+        { "let", TokenType.LET },
+        { "while", TokenType.WHILE },
+    };
 
     public Lexer(string source)
     {
@@ -104,28 +125,101 @@ public class Lexer
                 IsString();
                 break;
             default:
-                ErrorReporter.Error(line, "Unexpected Character.");
+                if (IsDigit(c))
+                {
+                    IsNumber();
+                }
+                else if (IsAlpha(c))
+                {
+                    IsIdentifier();
+                }
+                else
+                {
+                    ErrorReporter.Error(line, "Unexpected Character.");
+                }
                 break;
         }
     }
-    private void IsString(){
-        while(Peek()!='"'&&!IsAtEnd()){
-            if(Peek()=='\n'){
+
+    private static bool IsAlpha(char c)
+    {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    }
+
+    private void IsIdentifier()
+    {
+        while (IsAlphaNumeric(Peek()))
+        {
+            Advance();
+        }
+        string text = source[start..current];
+        if (!keywords.TryGetValue(text, out TokenType type))
+        {
+            type = TokenType.IDENTIFIER;
+        }
+        AddToken(type);
+    }
+
+    private bool IsAlphaNumeric(char c)
+    {
+        return IsAlpha(c) || IsDigit(c);
+    }
+
+    private void IsNumber()
+    {
+        while (IsDigit(Peek()))
+        {
+            Advance();
+        }
+        //Look for a fractional part.
+        if (Peek() == '.' && IsDigit(PeekNext()))
+        {
+            //consume the "."
+            Advance();
+            while (IsDigit(Peek()))
+            {
+                Advance();
+            }
+        }
+        AddToken(TokenType.NUMBER, Double.Parse(source[start..current]));
+    }
+
+    private char PeekNext()
+    {
+        if (current + 1 >= source.Length)
+        {
+            return '\0';
+        }
+        return source[current + 1];
+    }
+
+    private static bool IsDigit(char c)
+    {
+        return c >= '0' && c <= '9';
+    }
+
+    private void IsString()
+    {
+        while (Peek() != '"' && !IsAtEnd())
+        {
+            if (Peek() == '\n')
+            {
                 line++;
             }
             Advance();
         }
-        if(IsAtEnd()){
-            ErrorReporter.Error(line,"Unterminated String.");
+        if (IsAtEnd())
+        {
+            ErrorReporter.Error(line, "Unterminated String.");
             return;
         }
         //the closing ".
         Advance();
         //Trim the surrounding quotes.
-        string value = source[(start+1)..(current-1)];
-        AddToken(TokenType.STRING,value);
-
+        string value = source[(start + 1)..(current - 1)];
+        AddToken(TokenType.STRING, value);
     }
+
     private char Peek()
     {
         if (IsAtEnd())
