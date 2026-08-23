@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Flux.Language.Diagnostics;
 namespace Flux.Language.Lexer;
 
 public class Lexer
@@ -160,7 +160,7 @@ public class Lexer
         AddToken(type);
     }
 
-    private bool IsAlphaNumeric(char c)
+    private static bool IsAlphaNumeric(char c)
     {
         return IsAlpha(c) || IsDigit(c);
     }

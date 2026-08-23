@@ -1,4 +1,4 @@
-namespace Flux.Language.Lexer;
+namespace Flux.Language.Diagnostics;
 
 public class ErrorReporter
 {

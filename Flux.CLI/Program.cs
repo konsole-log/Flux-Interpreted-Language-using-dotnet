@@ -1,5 +1,5 @@
 ﻿using Flux.Language.Lexer;
-
+using Flux.Language.Diagnostics;
 namespace Flux.CLI;
 
 public class Flux
@@ -28,7 +28,6 @@ public class Flux
         if (ErrorReporter.hadError)
             Environment.Exit(65);
     }
-
     private static void RunPrompt()
     {
         // Writing a REPL which also stands for Read a line of input, Evaluate it, Print the result, then Loop and do it all over again.
