@@ -1,101 +1,117 @@
 using Flux.Language.Lexer;
+
 namespace Flux.Language.AST;
 
-public abstract class Expr {
+public abstract class Expr
+{
+    public abstract T Accept<T>(Visitor<T> visitor);
 
-	public abstract T Accept<T>(Visitor<T> visitor);
+    public interface Visitor<T>
+    {
+        public T VisitBinaryExpr(Binary expr);
+        public T VisitGroupingExpr(Grouping expr);
+        public T VisitLiteralExpr(Literal expr);
+        public T VisitUnaryExpr(Unary expr);
+    }
 
-	public interface Visitor<T> {
-		public T VisitBinaryExpr(Binary expr);
-		public T VisitGroupingExpr(Grouping expr);
-		public T VisitLiteralExpr(Literal expr);
-		public T VisitUnaryExpr(Unary expr);
-	}
+    public class Binary : Expr
+    {
+        readonly Expr left;
+        readonly Token opr;
+        readonly Expr right;
 
-	public class Binary : Expr {
+        public Expr getLeft()
+        {
+            return left;
+        }
 
-		readonly Expr left;
-		readonly Token opr;
-		readonly Expr right;
+        public Token getOpr()
+        {
+            return opr;
+        }
 
-		public Expr getLeft() {
-			return left;
-		}
+        public Expr getRight()
+        {
+            return right;
+        }
 
-		public Token getOpr() {
-			return opr;
-		}
+        public Binary(Expr left, Token opr, Expr right)
+        {
+            this.left = left;
+            this.opr = opr;
+            this.right = right;
+        }
 
-		public Expr getRight() {
-			return right;
-		}
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitBinaryExpr(this);
+        }
+    }
 
-		public Binary(Expr left, Token opr, Expr right) {
-			this.left = left;
-			this.opr = opr;
-			this.right = right;
-		}
+    public class Grouping : Expr
+    {
+        readonly Expr expression;
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitBinaryExpr(this);
-		}
-	}
+        public Expr getExpression()
+        {
+            return expression;
+        }
 
-	public class Grouping : Expr {
+        public Grouping(Expr expression)
+        {
+            this.expression = expression;
+        }
 
-		readonly Expr expression;
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitGroupingExpr(this);
+        }
+    }
 
-		public Expr getExpression() {
-			return expression;
-		}
+    public class Literal : Expr
+    {
+        readonly Object? value;
 
-		public Grouping(Expr expression) {
-			this.expression = expression;
-		}
+        public Object? getValue()
+        {
+            return value;
+        }
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitGroupingExpr(this);
-		}
-	}
+        public Literal(Object? value)
+        {
+            this.value = value;
+        }
 
-	public class Literal : Expr {
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitLiteralExpr(this);
+        }
+    }
 
-		readonly Object? value;
+    public class Unary : Expr
+    {
+        readonly Token opr;
+        readonly Expr right;
 
-		public Object? getValue() {
-			return value;
-		}
+        public Token getOpr()
+        {
+            return opr;
+        }
 
-		public Literal(Object? value) {
-			this.value = value;
-		}
+        public Expr getRight()
+        {
+            return right;
+        }
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitLiteralExpr(this);
-		}
-	}
+        public Unary(Token opr, Expr right)
+        {
+            this.opr = opr;
+            this.right = right;
+        }
 
-	public class Unary : Expr {
-
-		readonly Token opr;
-		readonly Expr right;
-
-		public Token getOpr() {
-			return opr;
-		}
-
-		public Expr getRight() {
-			return right;
-		}
-
-		public Unary(Token opr, Expr right) {
-			this.opr = opr;
-			this.right = right;
-		}
-
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitUnaryExpr(this);
-		}
-	}
-
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitUnaryExpr(this);
+        }
+    }
 }

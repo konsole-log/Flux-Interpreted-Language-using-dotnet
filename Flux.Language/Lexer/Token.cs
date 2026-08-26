@@ -14,7 +14,9 @@ public class Token
         this.literal = literal;
         this.line = line;
     }
-
+    public TokenType getType(){return this.type;}
+    public Object? getLiteral(){return this.literal;}
+    public string getLexeme(){return this.lexeme;}
     public override string ToString()
     {
         return $"Type:{this.type,-15} Lexeme: {this.lexeme,-10} Literal: {this.literal,-10}";

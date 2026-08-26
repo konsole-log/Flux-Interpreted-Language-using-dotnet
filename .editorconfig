@@ -1,0 +1,4 @@
+[*.cs]
+
+# Hide all IDE/code-style diagnostics
+dotnet_analyzer_diagnostic.category-Style.severity = none
