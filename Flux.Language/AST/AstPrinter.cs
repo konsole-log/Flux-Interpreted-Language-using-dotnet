@@ -3,42 +3,34 @@ using Flux.Language.Lexer;
 
 namespace Flux.Language.AST;
 
-public class AstPrinter : Expr.Visitor<string>
-{
-    public string Print(Expr expr)
-    {
+public class AstPrinter : Expr.Visitor<string> {
+    public string Print(Expr expr) {
         return expr.Accept(this);
     }
 
-    public string VisitBinaryExpr(Expr.Binary expr)
-    {
+    public string VisitBinaryExpr(Expr.Binary expr) {
         return Parenthesize(expr.getOpr().getLexeme(), expr.getLeft(), expr.getRight());
     }
 
-    public string VisitGroupingExpr(Expr.Grouping expr)
-    {
+    public string VisitGroupingExpr(Expr.Grouping expr) {
         return Parenthesize("group", expr.getExpression());
     }
 
-    public string VisitLiteralExpr(Expr.Literal expr)
-    {
+    public string VisitLiteralExpr(Expr.Literal expr) {
         if (expr.getValue() == null)
             return "nil";
         return expr.getValue().ToString();
     }
 
-    public string VisitUnaryExpr(Expr.Unary expr)
-    {
+    public string VisitUnaryExpr(Expr.Unary expr) {
         return Parenthesize(expr.getOpr().getLexeme(), expr.getRight());
     }
 
-    private string Parenthesize(string name, params Expr[] exprs)
-    {
+    private string Parenthesize(string name, params Expr[] exprs) {
         StringBuilder builder = new StringBuilder();
 
         builder.Append("(").Append(name);
-        foreach (Expr expr in exprs)
-        {
+        foreach (Expr expr in exprs) {
             builder.Append(" ");
             builder.Append(expr.Accept(this));
         }

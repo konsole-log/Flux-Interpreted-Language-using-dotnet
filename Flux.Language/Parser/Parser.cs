@@ -14,6 +14,18 @@ public class Parser
         this.tokens = tokens;
     }
 
+    public Expr Parse()
+    {
+        try
+        {
+            return Expression();
+        }
+        catch (ParseError error)
+        {
+            return null;
+        }
+    }
+
     private Expr Expression()
     {
         return Equality();
@@ -94,15 +106,22 @@ public class Parser
         {
             return new Expr.Literal(Previous().getLiteral());
         }
-        if(Match(TokenType.LEFT_PAREN)){
+        if (Match(TokenType.LEFT_PAREN))
+        {
             Expr expr = Expression();
-            Consume(TokenType.RIGHT_PAREN,"Expect ')' after expression.");
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+        throw Error(Peek(), "Expect Expression.");
     }
-    
-    private void Consume(TokenType type, string error){
 
+    private Token Consume(TokenType type, string message)
+    {
+        if (Check(type))
+        {
+            return Advance();
+        }
+        throw Error(Peek(), message);
     }
 
     private bool Match(params TokenType[] types)
@@ -145,5 +164,36 @@ public class Parser
     private Token Previous()
     {
         return tokens[current - 1];
+    }
+
+    private ParseError Error(Token token, string message)
+    {
+        ErrorReporter.Error(token, message);
+        return new ParseError();
+    }
+
+    private void Synchronize()
+    {
+        Advance();
+        while (!IsAtEnd())
+        {
+            if (Previous().getType() == TokenType.SEMICOLON)
+            {
+                return;
+            }
+            switch (Peek().getType())
+            {
+                case TokenType.CLASS:
+                case TokenType.FUN:
+                case TokenType.LET:
+                case TokenType.FOR:
+                case TokenType.IF:
+                case TokenType.WHILE:
+                case TokenType.PRINT:
+                case TokenType.RETURN:
+                    return;
+            }
+            Advance();
+        }
     }
 }

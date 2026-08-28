@@ -17,6 +17,7 @@ public class Token
     public TokenType getType(){return this.type;}
     public Object? getLiteral(){return this.literal;}
     public string getLexeme(){return this.lexeme;}
+    public int getLine(){return this.line;}
     public override string ToString()
     {
         return $"Type:{this.type,-15} Lexeme: {this.lexeme,-10} Literal: {this.literal,-10}";

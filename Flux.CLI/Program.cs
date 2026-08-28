@@ -1,10 +1,13 @@
 ﻿using Flux.Language.Lexer;
 using Flux.Language.Diagnostics;
 using Flux.Language.AST;
+using Flux.Language.Parser;
+using Flux.Language.Interpreter;
 namespace Flux.CLI;
 
 public class Flux
 {
+    private static readonly Interpreter interpreter = new Interpreter();
 
     public static void Main(string[] args)
     {
@@ -28,6 +31,7 @@ public class Flux
         Run(File.ReadAllText(path));
         if (ErrorReporter.hadError)
             Environment.Exit(65);
+        if(ErrorReporter.hadRunTimeError) Environment.Exit(70);
     }
     private static void RunPrompt()
     {
@@ -53,15 +57,13 @@ public class Flux
         //lexer code goes here
         Lexer lexer = new(source);
         List<Token> tokens = lexer.ScanTokens();
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.Parse();
+        if(ErrorReporter.hadError)return;
         foreach(Token token in tokens){
             Console.WriteLine(token);
         }
-        Expr expression = new Expr.Binary(
-            new Expr.Unary(new Token(TokenType.MINUS, "-", null, 1), new Expr.Literal(123)),
-            new Token(TokenType.STAR, "*", null, 1),
-            new Expr.Grouping(new Expr.Literal(45.67))
-        );
         Console.WriteLine(new AstPrinter().Print(expression));
-
+        interpreter.Interpret(expression);
     }
 }
