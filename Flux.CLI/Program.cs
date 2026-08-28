@@ -58,12 +58,24 @@ public class Flux
         Lexer lexer = new(source);
         List<Token> tokens = lexer.ScanTokens();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.Parse();
-        if(ErrorReporter.hadError)return;
-        foreach(Token token in tokens){
-            Console.WriteLine(token);
-        }
-        Console.WriteLine(new AstPrinter().Print(expression));
-        interpreter.Interpret(expression);
+        List<Stmt> statements = parser.Parse();
+
+        if(ErrorReporter.hadError) return;
+        interpreter.Interpret(statements);
+
+
+
+
+
+        // Expr expression = parser.Parse();
+        // if(ErrorReporter.hadError)return;
+        // Console.WriteLine("Lexer Steps:");
+        // foreach(Token token in tokens){
+        //     Console.WriteLine(token);
+        // }
+        // Console.WriteLine("Parse tree not pretty but parse tree:");
+        // Console.WriteLine(new AstPrinter().Print(expression));
+        // Console.WriteLine("Intepreted Answer:");
+        // interpreter.Interpret(expression);
     }
 }

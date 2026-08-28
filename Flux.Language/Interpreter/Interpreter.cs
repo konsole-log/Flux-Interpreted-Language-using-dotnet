@@ -5,16 +5,23 @@ using Flux.Language.Parser;
 
 namespace Flux.Language.Interpreter;
 
-public class Interpreter : Expr.Visitor<Object?>
+public class Interpreter : Expr.Visitor<Object?>,Stmt.Visitor<Object?>
 {
-    public void Interpret(Expr expression){
+    private Env environment = new Env();
+    public void Interpret(List<Stmt> statements){
       try{
-        Object? value = Evaluate(expression);
-        Console.WriteLine(Stringify(value));
+        foreach(Stmt statement in statements){
+          Execute(statement);
+        }
       }catch(RunTimeError error){
         ErrorReporter.RunTimeError(error);
       }
     }
+
+    private void Execute(Stmt stmt){
+      stmt.Accept(this);
+    }
+
     public Object? VisitLiteralExpr(Expr.Literal expr) { 
       return expr.getValue();
     }
@@ -47,8 +54,8 @@ public class Interpreter : Expr.Visitor<Object?>
           if (left is double && right is double){
             return (double)left + (double)right;
           }
-          if(left is string && right is string){
-            return (string)left + (string)right;
+          if(left is string || right is string){
+            return Stringify(left)+" "+Stringify(right);
           }
           throw new RunTimeError(expr.getOpr(),"Operands must be two numbers or two strings");
         case TokenType.SLASH:
@@ -78,6 +85,35 @@ public class Interpreter : Expr.Visitor<Object?>
       return null;
     }
 
+    public Object? VisitExpressionStmt(Stmt.Expression stmt){
+      Evaluate(stmt.getExpression());
+      return null;
+    }
+
+    public Object? VisitPrintStmt(Stmt.Print stmt){
+      Object? value = Evaluate(stmt.getExpression());
+      Console.WriteLine(Stringify(value));
+      return null;
+    }
+    
+    public Object? VisitLetStmt(Stmt.Let stmt){
+      Object? value = null;
+      if(stmt.getInitializer()!=null){
+        value = Evaluate(stmt.getInitializer());
+      }
+      environment.Define(stmt.getName().getLexeme(),value);
+      return null;
+    }
+
+    public Object? VisitVariableExpr(Expr.Variable expr){
+      return environment.get(expr.getName());
+    }
+
+    public Object? VisitAssignExpr(Expr.Assign expr){
+      Object? value = Evaluate(expr.getValue());
+      environment.Assign(expr.getName(),value);
+      return value;
+    }
     public string Stringify(Object? obj){
       if(obj == null) return "nil";
       if(obj is double){

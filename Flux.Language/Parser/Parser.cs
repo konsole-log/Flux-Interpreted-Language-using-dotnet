@@ -14,21 +14,73 @@ public class Parser
         this.tokens = tokens;
     }
 
-    public Expr Parse()
+    public List<Stmt> Parse()
     {
-        try
-        {
-            return Expression();
+        List<Stmt> statements = new List<Stmt>();
+        while(!IsAtEnd()){
+            statements.Add(Declaration());
         }
-        catch (ParseError error)
-        {
+        return statements;
+    }
+
+    private Stmt Declaration(){
+        try{
+            if(Match(TokenType.LET)) return VarDeclaration();
+
+            return Statement();
+        }catch(ParseError error){
+            Synchronize();
             return null;
         }
     }
+    private Stmt Statement(){
+        if(Match(TokenType.PRINT)){
+            return PrintStatement();
+        }
+        return ExpressionStatement();
+    }
 
+    private Stmt.Print PrintStatement(){
+        Expr value = Expression();
+        Consume(TokenType.SEMICOLON,$"Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt VarDeclaration(){
+        Token name = Consume(TokenType.IDENTIFIER,"Expect variable name.");
+
+        Expr initializer = null;
+        if(Match(TokenType.EQUAL)){
+            initializer = Expression();
+        }
+        Consume(TokenType.SEMICOLON,$"Expect ';' after variable declaration.");
+        return new Stmt.Let(name,initializer);
+    }
+
+    private Stmt.Expression ExpressionStatement(){
+        Expr expr = Expression();
+        Consume(TokenType.SEMICOLON,$"Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
+    private Expr Assignment(){
+        Expr expr = Equality();
+
+        if(Match(TokenType.EQUAL)){
+            Token equals = Previous();
+            Expr value = Assignment();
+
+            if(expr is Expr.Variable){
+                Token name = ((Expr.Variable)expr).getName();
+                return new Expr.Assign(name,value);
+            }
+            ErrorReporter.Error(equals,"Invalid Assignment target.");
+        }
+        return expr;
+    }
     private Expr Expression()
     {
-        return Equality();
+        return Assignment();
     }
 
     private Expr Equality()
@@ -101,7 +153,9 @@ public class Parser
             return new Expr.Literal(true);
         if (Match(TokenType.NIL))
             return new Expr.Literal(null);
-
+        if (Match(TokenType.IDENTIFIER)){
+            return new Expr.Variable(Previous());
+        }
         if (Match(TokenType.NUMBER, TokenType.STRING))
         {
             return new Expr.Literal(Previous().getLiteral());

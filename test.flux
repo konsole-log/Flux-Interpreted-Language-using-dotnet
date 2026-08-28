@@ -1,1 +1,4 @@
-10-20*5;
+let x = 1;
+let y = 2;
+print x+y;
+

@@ -11,7 +11,14 @@ public class AstPrinter : Expr.Visitor<string> {
     public string VisitBinaryExpr(Expr.Binary expr) {
         return Parenthesize(expr.getOpr().getLexeme(), expr.getLeft(), expr.getRight());
     }
+    public string VisitAssignExpr(Expr.Assign expr){
+        return Parenthesize($"={expr.getName().getLexeme()}",expr.getValue());
+    }
 
+    public string VisitVariableExpr(Expr.Variable expr){
+        return expr.getName().getLexeme();
+    }
+     
     public string VisitGroupingExpr(Expr.Grouping expr) {
         return Parenthesize("group", expr.getExpression());
     }
