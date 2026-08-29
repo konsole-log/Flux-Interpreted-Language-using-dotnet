@@ -1,72 +1,139 @@
-using Flux.Language.Lexer;
 using Flux.Language.Diagnostics;
+using Flux.Language.Lexer;
+
 namespace Flux.Language.AST;
 
-public abstract class Stmt {
+public abstract class Stmt
+{
+    public abstract T Accept<T>(Visitor<T> visitor);
 
-	public abstract T Accept<T>(Visitor<T> visitor);
+    public interface Visitor<T>
+    {
+        public T VisitBlockStmt(Block stmt);
+        public T VisitExpressionStmt(Expression stmt);
+        public T VisitIfStmt(If stmt);
+        public T VisitPrintStmt(Print stmt);
+        public T VisitLetStmt(Let stmt);
+    }
 
-	public interface Visitor<T> {
-		public T VisitExpressionStmt(Expression stmt);
-		public T VisitPrintStmt(Print stmt);
-		public T VisitLetStmt(Let stmt);
-	}
+    public class Block : Stmt
+    {
+        readonly List<Stmt> statements;
 
-	public class Expression : Stmt {
+        public List<Stmt> getStatements()
+        {
+            return statements;
+        }
 
-		readonly Expr expression;
+        public Block(List<Stmt> statements)
+        {
+            this.statements = statements;
+        }
 
-		public Expr getExpression() {
-			return expression;
-		}
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitBlockStmt(this);
+        }
+    }
 
-		public Expression(Expr expression) {
-			this.expression = expression;
-		}
+    public class Expression : Stmt
+    {
+        readonly Expr expression;
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitExpressionStmt(this);
-		}
-	}
+        public Expr getExpression()
+        {
+            return expression;
+        }
 
-	public class Print : Stmt {
+        public Expression(Expr expression)
+        {
+            this.expression = expression;
+        }
 
-		readonly Expr expression;
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitExpressionStmt(this);
+        }
+    }
 
-		public Expr getExpression() {
-			return expression;
-		}
+    public class If : Stmt
+    {
+        readonly Expr condition;
+        readonly Stmt thenBranch;
+        readonly Stmt? elseBranch;
 
-		public Print(Expr expression) {
-			this.expression = expression;
-		}
+        public Expr getCondition()
+        {
+            return condition;
+        }
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitPrintStmt(this);
-		}
-	}
+        public Stmt getThenbranch()
+        {
+            return thenBranch;
+        }
 
-	public class Let : Stmt {
+        public Stmt? getElsebranch()
+        {
+            return elseBranch;
+        }
 
-		readonly Token name;
-		readonly Expr initializer;
+        public If(Expr condition, Stmt thenBranch, Stmt? elseBranch)
+        {
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
 
-		public Token getName() {
-			return name;
-		}
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitIfStmt(this);
+        }
+    }
 
-		public Expr getInitializer() {
-			return initializer;
-		}
+    public class Print : Stmt
+    {
+        readonly Expr expression;
 
-		public Let(Token name, Expr initializer) {
-			this.name = name;
-			this.initializer = initializer;
-		}
+        public Expr getExpression()
+        {
+            return expression;
+        }
 
-		public override T Accept<T>(Visitor<T> visitor) {
-			return visitor.VisitLetStmt(this);
-		}
-	}
+        public Print(Expr expression)
+        {
+            this.expression = expression;
+        }
 
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitPrintStmt(this);
+        }
+    }
+
+    public class Let : Stmt
+    {
+        readonly Token name;
+        readonly Expr? initializer;
+
+        public Token getName()
+        {
+            return name;
+        }
+
+        public Expr? getInitializer()
+        {
+            return initializer;
+        }
+
+        public Let(Token name, Expr? initializer)
+        {
+            this.name = name;
+            this.initializer = initializer;
+        }
+
+        public override T Accept<T>(Visitor<T> visitor)
+        {
+            return visitor.VisitLetStmt(this);
+        }
+    }
 }

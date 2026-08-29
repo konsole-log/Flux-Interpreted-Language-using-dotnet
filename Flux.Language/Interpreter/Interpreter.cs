@@ -22,8 +22,25 @@ public class Interpreter : Expr.Visitor<Object?>,Stmt.Visitor<Object?>
       stmt.Accept(this);
     }
 
+    public void ExecuteBlock(List<Stmt> statements, Env environment){
+      Env previous = this.environment;
+      try{
+        this.environment=environment;
+        foreach(Stmt statement in statements){
+          Execute(statement);
+        }
+      }finally{
+        this.environment = previous;
+      }
+    }
+    
     public Object? VisitLiteralExpr(Expr.Literal expr) { 
       return expr.getValue();
+    }
+    
+    public Object? VisitBlockStmt(Stmt.Block stmt){
+      ExecuteBlock(stmt.getStatements(),new Env(environment));
+      return null;
     }
 
     public Object? VisitBinaryExpr(Expr.Binary expr){

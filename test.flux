@@ -1,4 +1,5 @@
-let x = 1;
-let y = 2;
-print x+y;
-
+{
+  let a = 10;
+  let a = a + 2;
+  print "The output is:" + a;
+print a;
