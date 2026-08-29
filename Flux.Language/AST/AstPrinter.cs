@@ -1,50 +1,83 @@
 using System.Text;
-using Flux.Language.Lexer;
 
 namespace Flux.Language.AST;
 
-public class AstPrinter : Expr.Visitor<string> {
-    public string Print(Expr expr) {
-        return expr.Accept(this);
-    }
+public class AstPrinter : Expr.Visitor<string>, Stmt.Visitor<string>
+{
 
-    public string VisitLogicalExpr(Expr.Logical expr){
-        return "";
-    }
-    public string VisitBinaryExpr(Expr.Binary expr) {
-        return Parenthesize(expr.getOpr().getLexeme(), expr.getLeft(), expr.getRight());
-    }
-    public string VisitAssignExpr(Expr.Assign expr){
-        return Parenthesize($"={expr.getName().getLexeme()}",expr.getValue());
-    }
+	public string Print(Expr expr)
+	{
+		return expr.Accept(this);
+	}
 
-    public string VisitVariableExpr(Expr.Variable expr){
-        return expr.getName().getLexeme();
-    }
-     
-    public string VisitGroupingExpr(Expr.Grouping expr) {
-        return Parenthesize("group", expr.getExpression());
-    }
+	public string Print(Stmt stmt)
+	{
+		return stmt.Accept(this);
+	}
 
-    public string VisitLiteralExpr(Expr.Literal expr) {
-        if (expr.getValue() == null)
-            return "nil";
-        return expr.getValue().ToString();
-    }
+	public string VisitBinaryExpr(Expr.Binary expr)
+	{
+		return "";
+	}
 
-    public string VisitUnaryExpr(Expr.Unary expr) {
-        return Parenthesize(expr.getOpr().getLexeme(), expr.getRight());
-    }
+	public string VisitAssignExpr(Expr.Assign expr)
+	{
+		return "";
+	}
 
-    private string Parenthesize(string name, params Expr[] exprs) {
-        StringBuilder builder = new StringBuilder();
+	public string VisitGroupingExpr(Expr.Grouping expr)
+	{
+		return "";
+	}
 
-        builder.Append("(").Append(name);
-        foreach (Expr expr in exprs) {
-            builder.Append(" ");
-            builder.Append(expr.Accept(this));
-        }
-        builder.Append(")");
-        return builder.ToString();
-    }
+	public string VisitLiteralExpr(Expr.Literal expr)
+	{
+		return "";
+	}
+
+	public string VisitLogicalExpr(Expr.Logical expr)
+	{
+		return "";
+	}
+
+	public string VisitUnaryExpr(Expr.Unary expr)
+	{
+		return "";
+	}
+
+	public string VisitVariableExpr(Expr.Variable expr)
+	{
+		return "";
+	}
+
+	public string VisitBlockStmt(Stmt.Block stmt)
+	{
+		return "";
+	}
+
+	public string VisitExpressionStmt(Stmt.Expression stmt)
+	{
+		return "";
+	}
+
+	public string VisitIfStmt(Stmt.If stmt)
+	{
+		return "";
+	}
+
+	public string VisitPrintStmt(Stmt.Print stmt)
+	{
+		return "";
+	}
+
+	public string VisitLetStmt(Stmt.Let stmt)
+	{
+		return "";
+	}
+
+	public string VisitWhileStmt(Stmt.While stmt)
+	{
+		return "";
+	}
+
 }

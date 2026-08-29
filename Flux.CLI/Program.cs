@@ -1,8 +1,9 @@
-﻿using Flux.Language.Lexer;
+﻿using Flux.Language.AST;
 using Flux.Language.Diagnostics;
-using Flux.Language.AST;
-using Flux.Language.Parser;
 using Flux.Language.Interpreter;
+using Flux.Language.Lexer;
+using Flux.Language.Parser;
+
 namespace Flux.CLI;
 
 public class Flux
@@ -31,8 +32,10 @@ public class Flux
         Run(File.ReadAllText(path));
         if (ErrorReporter.hadError)
             Environment.Exit(65);
-        if(ErrorReporter.hadRunTimeError) Environment.Exit(70);
+        if (ErrorReporter.hadRunTimeError)
+            Environment.Exit(70);
     }
+
     private static void RunPrompt()
     {
         // Writing a REPL which also stands for Read a line of input, Evaluate it, Print the result, then Loop and do it all over again.
@@ -49,7 +52,7 @@ public class Flux
             }
             Run(input);
             ErrorReporter.hadError = false;
-    }
+        }
     }
 
     private static void Run(string source)
@@ -57,25 +60,22 @@ public class Flux
         //lexer code goes here
         Lexer lexer = new(source);
         List<Token> tokens = lexer.ScanTokens();
-        Parser parser = new Parser(tokens);
-        List<Stmt> statements = parser.Parse();
-
-        if(ErrorReporter.hadError) return;
-        interpreter.Interpret(statements);
-
-
-
-
-
-        // Expr expression = parser.Parse();
-        // if(ErrorReporter.hadError)return;
         // Console.WriteLine("Lexer Steps:");
-        // foreach(Token token in tokens){
+        // foreach (Token token in tokens)
+        // {
         //     Console.WriteLine(token);
         // }
-        // Console.WriteLine("Parse tree not pretty but parse tree:");
-        // Console.WriteLine(new AstPrinter().Print(expression));
-        // Console.WriteLine("Intepreted Answer:");
-        // interpreter.Interpret(expression);
+ 
+        //parser is here
+        Parser parser = new Parser(tokens);
+       
+        List<Stmt> statements = parser.Parse();
+        // need to add good output for the parser
+        // foreach(Stmt statement in statements){
+        //     Console.WriteLine(new AstPrinter().Print(statement));
+        // }
+        if (ErrorReporter.hadError)
+            return;
+        interpreter.Interpret(statements);
     }
 }
