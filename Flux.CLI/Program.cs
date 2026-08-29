@@ -29,7 +29,8 @@ public class Flux
 
     private static void RunFile(string path)
     {
-        Run(File.ReadAllText(path));
+        string source = File.ReadAllText(path);
+        Run(source);
         if (ErrorReporter.hadError)
             Environment.Exit(65);
         if (ErrorReporter.hadRunTimeError)
@@ -51,6 +52,7 @@ public class Flux
                 break;
             }
             Run(input);
+
             ErrorReporter.hadError = false;
         }
     }
@@ -60,11 +62,11 @@ public class Flux
         //lexer code goes here
         Lexer lexer = new(source);
         List<Token> tokens = lexer.ScanTokens();
-        // Console.WriteLine("Lexer Steps:");
-        // foreach (Token token in tokens)
-        // {
-        //     Console.WriteLine(token);
-        // }
+        Console.WriteLine("Lexer Steps:");
+        foreach (Token token in tokens)
+        {
+            Console.WriteLine(token);
+        }
  
         //parser is here
         Parser parser = new Parser(tokens);

@@ -5,7 +5,7 @@ namespace Flux.Language.Lexer;
 public class Lexer
 {
     private readonly string? source; //input file
-    private readonly List<Token> tokens = new List<Token>(); //output of the list of the token
+    private readonly List<Token> tokens = new();//output of the list of the token
     private int start = 0;
     private int current = 0;
     private int line = 1;

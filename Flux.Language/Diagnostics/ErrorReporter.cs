@@ -14,7 +14,9 @@ public class ErrorReporter
 
     private static void Report(int line, string position, string message)
     {
-        Console.Error.WriteLine($"[Line {line} Error {position} :{message}]");
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.Error.WriteLine($"[Line {line} Error {position} : {message}]");
+        Console.ResetColor();
         hadError = true;
     }
 
@@ -32,7 +34,9 @@ public class ErrorReporter
 
     public static void RunTimeError(RunTimeError error)
     {
-        Console.Error.WriteLine($"{error.Message}\n[Line {error.token.getLine()} ]");
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.Error.WriteLine($"\n[Line {error.token.getLine()} {error.Message}]");
+        Console.ResetColor();
         hadRunTimeError = true;
     }
 }

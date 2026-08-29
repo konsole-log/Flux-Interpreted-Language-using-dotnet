@@ -363,7 +363,7 @@ public class Parser
     private ParseError Error(Token token, string message)
     {
         ErrorReporter.Error(token, message);
-        return new ParseError();
+        return new ParseError(token, message);
     }
 
     private void Synchronize()
