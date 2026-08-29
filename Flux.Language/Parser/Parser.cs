@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Flux.Language.AST;
 using Flux.Language.Diagnostics;
 using Flux.Language.Lexer;
@@ -17,94 +18,205 @@ public class Parser
     public List<Stmt> Parse()
     {
         List<Stmt> statements = new List<Stmt>();
-        while(!IsAtEnd()){
+        while (!IsAtEnd())
+        {
             statements.Add(Declaration());
         }
         return statements;
     }
 
-    private Stmt? Declaration(){
-        try{
-            if(Match(TokenType.LET)) return VarDeclaration();
+    private Stmt Declaration()
+    {
+        try
+        {
+            if (Match(TokenType.LET))
+                return VarDeclaration();
 
             return Statement();
-        }catch(ParseError error){
+        }
+        catch (ParseError error)
+        {
             Synchronize();
             return null;
         }
     }
-    private Stmt Statement(){
-        if(Match(TokenType.IF)){
+
+    private Stmt Statement()
+    {
+        if (Match(TokenType.FOR))
+        {
+            return ForStatement();
+        }
+        if (Match(TokenType.IF))
+        {
             return IfStatement();
         }
-        if(Match(TokenType.PRINT)){
+        if (Match(TokenType.PRINT))
+        {
             return PrintStatement();
         }
-        if(Match(TokenType.LEFT_BRACE)){
+        if (Match(TokenType.WHILE))
+        {
+            return WhileStatement();
+        }
+        if (Match(TokenType.LEFT_BRACE))
+        {
             return new Stmt.Block(Block());
         }
         return ExpressionStatement();
     }
 
-    private Stmt IfStatement(){
-        Consume(TokenType.LEFT_PAREN,$"Expect '(' after 'if'. ");
+    private Stmt ForStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+        Stmt? initializer;
+        if (Match(TokenType.SEMICOLON))
+        {
+            initializer = null;
+        }
+        else if (Match(TokenType.LET))
+        {
+            initializer = VarDeclaration();
+        }
+        else
+        {
+            initializer = ExpressionStatement();
+        }
+
+        Expr? condition = null;
+        if (!Check(TokenType.SEMICOLON))
+        {
+            condition = Expression();
+        }
+        Consume(TokenType.SEMICOLON, "Expect ';' after loop condition");
+
+        Expr? increment = null;
+        if(!Check(TokenType.RIGHT_PAREN)){
+            increment = Expression();
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        Stmt body = Statement();
+
+        if(increment !=null){
+            body = new Stmt.Block([body,new Stmt.Expression(increment)]);
+        }
+        if(condition == null){
+            condition = new Expr.Literal(true);
+        }
+        body = new Stmt.While(condition,body);
+
+        if(initializer!=null){
+            body = new Stmt.Block([initializer,body]);
+        }
+        return body;
+    }
+
+    private Stmt.If IfStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, $"Expect '(' after 'if'. ");
         Expr condition = Expression();
-        Consume(TokenType.RIGHT_PAREN,$"Expect ')' after if condition");
+        Consume(TokenType.RIGHT_PAREN, $"Expect ')' after if condition");
         Stmt thenBranch = Statement();
         Stmt? elseBranch = null;
-        if(Match(TokenType.ELSE)){
+        if (Match(TokenType.ELSE))
+        {
             elseBranch = Statement();
         }
-        return new Stmt.If(condition,thenBranch,elseBranch);
-
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
-    private Stmt.Print PrintStatement(){
+
+    private Stmt.Print PrintStatement()
+    {
         Expr value = Expression();
-        Consume(TokenType.SEMICOLON,$"Expect ';' after value.");
+        Consume(TokenType.SEMICOLON, $"Expect ';' after value.");
         return new Stmt.Print(value);
     }
 
-    private Stmt VarDeclaration(){
-        Token name = Consume(TokenType.IDENTIFIER,"Expect variable name.");
+    private Stmt.Let VarDeclaration()
+    {
+        Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
 
         Expr? initializer = null;
-        if(Match(TokenType.EQUAL)){
+        if (Match(TokenType.EQUAL))
+        {
             initializer = Expression();
         }
-        Consume(TokenType.SEMICOLON,$"Expect ';' after variable declaration.");
-        return new Stmt.Let(name,initializer);
+        Consume(TokenType.SEMICOLON, $"Expect ';' after variable declaration.");
+        return new Stmt.Let(name, initializer);
     }
 
-    private Stmt.Expression ExpressionStatement(){
+    private Stmt.While WhileStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expect '{{' after 'while'.");
+        Expr condition = Expression();
+        Consume(TokenType.RIGHT_PAREN, "Expect '}}' after condition.");
+        Stmt body = Statement();
+
+        return new Stmt.While(condition, body);
+    }
+
+    private Stmt.Expression ExpressionStatement()
+    {
         Expr expr = Expression();
-        Consume(TokenType.SEMICOLON,$"Expect ';' after expression.");
+        Consume(TokenType.SEMICOLON, $"Expect ';' after expression.");
         return new Stmt.Expression(expr);
     }
 
-    private List<Stmt> Block(){
+    private List<Stmt> Block()
+    {
         List<Stmt> statements = new List<Stmt>();
-        while(!Check(TokenType.RIGHT_BRACE) && !IsAtEnd()){
+        while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+        {
             statements.Add(Declaration());
         }
-        Consume(TokenType.RIGHT_BRACE,$"Expect '}}' after block.");
+        Consume(TokenType.RIGHT_BRACE, $"Expect '}}' after block.");
         return statements;
     }
-    
-    private Expr Assignment(){
-        Expr expr = Equality();
 
-        if(Match(TokenType.EQUAL)){
+    private Expr Assignment()
+    {
+        Expr expr = OrExp();
+
+        if (Match(TokenType.EQUAL))
+        {
             Token equals = Previous();
             Expr value = Assignment();
 
-            if(expr is Expr.Variable){
+            if (expr is Expr.Variable)
+            {
                 Token name = ((Expr.Variable)expr).getName();
-                return new Expr.Assign(name,value);
+                return new Expr.Assign(name, value);
             }
-            ErrorReporter.Error(equals,"Invalid Assignment target.");
+            ErrorReporter.Error(equals, "Invalid Assignment target.");
         }
         return expr;
     }
+
+    private Expr OrExp()
+    {
+        Expr expr = AndExp();
+        while (Match(TokenType.OR))
+        {
+            Token opr = Previous();
+            Expr right = AndExp();
+            expr = new Expr.Logical(expr, opr, right);
+        }
+        return expr;
+    }
+
+    private Expr AndExp()
+    {
+        Expr expr = Equality();
+        while (Match(TokenType.AND))
+        {
+            Token opr = Previous();
+            Expr right = Equality();
+            expr = new Expr.Logical(expr, opr, right);
+        }
+        return expr;
+    }
+
     private Expr Expression()
     {
         return Assignment();
@@ -180,7 +292,8 @@ public class Parser
             return new Expr.Literal(true);
         if (Match(TokenType.NIL))
             return new Expr.Literal(null);
-        if (Match(TokenType.IDENTIFIER)){
+        if (Match(TokenType.IDENTIFIER))
+        {
             return new Expr.Variable(Previous());
         }
         if (Match(TokenType.NUMBER, TokenType.STRING))

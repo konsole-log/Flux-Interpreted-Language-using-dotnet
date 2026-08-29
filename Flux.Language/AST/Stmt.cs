@@ -1,139 +1,144 @@
-using Flux.Language.Diagnostics;
 using Flux.Language.Lexer;
-
+using Flux.Language.Diagnostics;
 namespace Flux.Language.AST;
 
-public abstract class Stmt
-{
-    public abstract T Accept<T>(Visitor<T> visitor);
+public abstract class Stmt {
 
-    public interface Visitor<T>
-    {
-        public T VisitBlockStmt(Block stmt);
-        public T VisitExpressionStmt(Expression stmt);
-        public T VisitIfStmt(If stmt);
-        public T VisitPrintStmt(Print stmt);
-        public T VisitLetStmt(Let stmt);
-    }
+	public abstract T Accept<T>(Visitor<T> visitor);
 
-    public class Block : Stmt
-    {
-        readonly List<Stmt> statements;
+	public interface Visitor<T> {
+		public T VisitBlockStmt(Block stmt);
+		public T VisitExpressionStmt(Expression stmt);
+		public T VisitIfStmt(If stmt);
+		public T VisitPrintStmt(Print stmt);
+		public T VisitLetStmt(Let stmt);
+		public T VisitWhileStmt(While stmt);
+	}
 
-        public List<Stmt> getStatements()
-        {
-            return statements;
-        }
+	public class Block : Stmt {
 
-        public Block(List<Stmt> statements)
-        {
-            this.statements = statements;
-        }
+		readonly List<Stmt> statements;
 
-        public override T Accept<T>(Visitor<T> visitor)
-        {
-            return visitor.VisitBlockStmt(this);
-        }
-    }
+		public List<Stmt> getStatements() {
+			return statements;
+		}
 
-    public class Expression : Stmt
-    {
-        readonly Expr expression;
+		public Block(List<Stmt> statements) {
+			this.statements = statements;
+		}
 
-        public Expr getExpression()
-        {
-            return expression;
-        }
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitBlockStmt(this);
+		}
+	}
 
-        public Expression(Expr expression)
-        {
-            this.expression = expression;
-        }
+	public class Expression : Stmt {
 
-        public override T Accept<T>(Visitor<T> visitor)
-        {
-            return visitor.VisitExpressionStmt(this);
-        }
-    }
+		readonly Expr expression;
 
-    public class If : Stmt
-    {
-        readonly Expr condition;
-        readonly Stmt thenBranch;
-        readonly Stmt? elseBranch;
+		public Expr getExpression() {
+			return expression;
+		}
 
-        public Expr getCondition()
-        {
-            return condition;
-        }
+		public Expression(Expr expression) {
+			this.expression = expression;
+		}
 
-        public Stmt getThenbranch()
-        {
-            return thenBranch;
-        }
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitExpressionStmt(this);
+		}
+	}
 
-        public Stmt? getElsebranch()
-        {
-            return elseBranch;
-        }
+	public class If : Stmt {
 
-        public If(Expr condition, Stmt thenBranch, Stmt? elseBranch)
-        {
-            this.condition = condition;
-            this.thenBranch = thenBranch;
-            this.elseBranch = elseBranch;
-        }
+		readonly Expr condition;
+		readonly Stmt thenBranch;
+		readonly Stmt? elseBranch;
 
-        public override T Accept<T>(Visitor<T> visitor)
-        {
-            return visitor.VisitIfStmt(this);
-        }
-    }
+		public Expr getCondition() {
+			return condition;
+		}
 
-    public class Print : Stmt
-    {
-        readonly Expr expression;
+		public Stmt getThenbranch() {
+			return thenBranch;
+		}
 
-        public Expr getExpression()
-        {
-            return expression;
-        }
+		public Stmt? getElsebranch() {
+			return elseBranch;
+		}
 
-        public Print(Expr expression)
-        {
-            this.expression = expression;
-        }
+		public If(Expr condition, Stmt thenBranch, Stmt? elseBranch) {
+			this.condition = condition;
+			this.thenBranch = thenBranch;
+			this.elseBranch = elseBranch;
+		}
 
-        public override T Accept<T>(Visitor<T> visitor)
-        {
-            return visitor.VisitPrintStmt(this);
-        }
-    }
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitIfStmt(this);
+		}
+	}
 
-    public class Let : Stmt
-    {
-        readonly Token name;
-        readonly Expr? initializer;
+	public class Print : Stmt {
 
-        public Token getName()
-        {
-            return name;
-        }
+		readonly Expr expression;
 
-        public Expr? getInitializer()
-        {
-            return initializer;
-        }
+		public Expr getExpression() {
+			return expression;
+		}
 
-        public Let(Token name, Expr? initializer)
-        {
-            this.name = name;
-            this.initializer = initializer;
-        }
+		public Print(Expr expression) {
+			this.expression = expression;
+		}
 
-        public override T Accept<T>(Visitor<T> visitor)
-        {
-            return visitor.VisitLetStmt(this);
-        }
-    }
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitPrintStmt(this);
+		}
+	}
+
+	public class Let : Stmt {
+
+		readonly Token name;
+		readonly Expr initializer;
+
+		public Token getName() {
+			return name;
+		}
+
+		public Expr getInitializer() {
+			return initializer;
+		}
+
+		public Let(Token name, Expr initializer) {
+			this.name = name;
+			this.initializer = initializer;
+		}
+
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitLetStmt(this);
+		}
+	}
+
+	public class While : Stmt {
+
+		readonly Expr condition;
+		readonly Stmt body;
+
+		public Expr getCondition() {
+			return condition;
+		}
+
+		public Stmt getBody() {
+			return body;
+		}
+
+		public While(Expr condition, Stmt body) {
+			this.condition = condition;
+			this.body = body;
+		}
+
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitWhileStmt(this);
+		}
+	}
+
 }

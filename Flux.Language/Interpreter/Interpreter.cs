@@ -37,9 +37,28 @@ public class Interpreter : Expr.Visitor<Object?>,Stmt.Visitor<Object?>
     public Object? VisitLiteralExpr(Expr.Literal expr) { 
       return expr.getValue();
     }
+
+    public Object? VisitLogicalExpr(Expr.Logical expr){
+      Object? left = Evaluate(expr.getLeft());
+      if(expr.getOpr().getType() == TokenType.OR){
+        if(IsTruthy(left)) return left;
+      }else{
+        if(!IsTruthy(left))return left;
+      }
+      return Evaluate(expr.getRight());
+    }
     
     public Object? VisitBlockStmt(Stmt.Block stmt){
       ExecuteBlock(stmt.getStatements(),new Env(environment));
+      return null;
+    }
+
+    public Object? VisitIfStmt(Stmt.If stmt){
+      if(IsTruthy(Evaluate(stmt.getCondition()))){
+        Execute(stmt.getThenbranch());
+      }else if(stmt.getElsebranch()!=null){
+        Execute(stmt.getElsebranch());
+      }
       return null;
     }
 
@@ -119,6 +138,13 @@ public class Interpreter : Expr.Visitor<Object?>,Stmt.Visitor<Object?>
         value = Evaluate(stmt.getInitializer());
       }
       environment.Define(stmt.getName().getLexeme(),value);
+      return null;
+    }
+
+    public Object? VisitWhileStmt(Stmt.While stmt){
+      while(IsTruthy(Evaluate(stmt.getCondition()))){
+        Execute(stmt.getBody());
+      }
       return null;
     }
 

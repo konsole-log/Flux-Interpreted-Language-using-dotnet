@@ -1,5 +1,8 @@
-{
-  let a = 10;
-  let a = a + 2;
-  print "The output is:" + a;
-print a;
+
+let num = 5;
+let fact = 1;
+for (let i = 1; i<=num; i=i+1){
+  fact = fact * i;
+}
+print "The factorial of " + num + " is " + fact;
+

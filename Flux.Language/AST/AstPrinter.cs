@@ -8,6 +8,9 @@ public class AstPrinter : Expr.Visitor<string> {
         return expr.Accept(this);
     }
 
+    public string VisitLogicalExpr(Expr.Logical expr){
+        return "";
+    }
     public string VisitBinaryExpr(Expr.Binary expr) {
         return Parenthesize(expr.getOpr().getLexeme(), expr.getLeft(), expr.getRight());
     }
