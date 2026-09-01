@@ -9,6 +9,7 @@ public abstract class Stmt {
 	public interface Visitor<T> {
 		public T VisitBlockStmt(Block stmt);
 		public T VisitExpressionStmt(Expression stmt);
+		public T VisitFunctionStmt(Function stmt);
 		public T VisitIfStmt(If stmt);
 		public T VisitPrintStmt(Print stmt);
 		public T VisitLetStmt(Let stmt);
@@ -46,6 +47,35 @@ public abstract class Stmt {
 
 		public override T Accept<T>(Visitor<T> visitor) {
 			return visitor.VisitExpressionStmt(this);
+		}
+	}
+
+	public class Function : Stmt {
+
+		readonly Token name;
+		readonly List<Token> parameters;
+		readonly List<Stmt> body;
+
+		public Token getName() {
+			return name;
+		}
+
+		public List<Token> getParams() {
+			return parameters;
+		}
+
+		public List<Stmt> getBody() {
+			return body;
+		}
+
+		public Function(Token name, List<Token> parameters, List<Stmt> body) {
+			this.name = name;
+			this.parameters = parameters;
+			this.body = body;
+		}
+
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitFunctionStmt(this);
 		}
 	}
 

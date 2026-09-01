@@ -276,6 +276,12 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
         return null;
     }
 
+    public Object? VisitFunctionStmt(Stmt.Function stmt){
+        FluxFunction function = new FluxFunction(stmt);
+        environment.Define(stmt.getName().getLexeme(),function);
+        return null;
+    }
+
     public Object? VisitPrintStmt(Stmt.Print stmt)
     {
         Object? value = Evaluate(stmt.getExpression());

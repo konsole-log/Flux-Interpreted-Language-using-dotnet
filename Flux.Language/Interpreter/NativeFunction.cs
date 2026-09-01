@@ -18,24 +18,34 @@ internal class NativeFunction : FluxCallable
         this.arity = arity;
         this.funcstr = func;
     }
-    public NativeFunction(int arity, Func<object, object, bool>func)
+
+    public NativeFunction(int arity, Func<object, object, bool> func)
     {
         this.arity = arity;
         this.funcbool = func;
     }
 
-    public int Arity(){
-      return arity;
-    }
-    public Object? Call(Interpreter interpreter, List<Object?> arguments){
-
-     return  funcbool !=null? funcbool.Invoke(interpreter,arguments):HandleNum(interpreter,arguments);
-    }
-    public Object? HandleNum(Interpreter interpreter, List<Object?> arguments){
-      return funcnum !=null?funcnum.Invoke(interpreter,arguments):funcstr.Invoke(interpreter, arguments);
-    }
-    public override string ToString() {
-      return "<native fn>";
+    public int Arity()
+    {
+        return arity;
     }
 
+    public Object? Call(Interpreter interpreter, List<Object?> arguments)
+    {
+        return funcbool != null
+            ? funcbool.Invoke(interpreter, arguments)
+            : HandleNum(interpreter, arguments);
+    }
+
+    public Object? HandleNum(Interpreter interpreter, List<Object?> arguments)
+    {
+        return funcnum != null
+            ? funcnum.Invoke(interpreter, arguments)
+            : funcstr.Invoke(interpreter, arguments);
+    }
+
+    public override string ToString()
+    {
+        return "<native fn>";
+    }
 }

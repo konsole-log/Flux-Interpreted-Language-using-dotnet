@@ -65,6 +65,11 @@ public class AstPrinter : Expr.Visitor<string>, Stmt.Visitor<string>
 		return "";
 	}
 
+	public string VisitFunctionStmt(Stmt.Function stmt)
+	{
+		return "";
+	}
+
 	public string VisitIfStmt(Stmt.If stmt)
 	{
 		return "";

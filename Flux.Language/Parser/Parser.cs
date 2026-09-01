@@ -29,6 +29,10 @@ public class Parser
     {
         try
         {
+            if (Match(TokenType.FUN))
+            {
+                return Function("function");
+            }
             if (Match(TokenType.LET))
                 return VarDeclaration();
 
@@ -91,23 +95,27 @@ public class Parser
         Consume(TokenType.SEMICOLON, "Expect ';' after loop condition");
 
         Expr? increment = null;
-        if(!Check(TokenType.RIGHT_PAREN)){
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
             increment = Expression();
         }
         Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
 
         Stmt body = Statement();
 
-        if(increment !=null){
-            body = new Stmt.Block([body,new Stmt.Expression(increment)]);
+        if (increment != null)
+        {
+            body = new Stmt.Block([body, new Stmt.Expression(increment)]);
         }
-        if(condition == null){
+        if (condition == null)
+        {
             condition = new Expr.Literal(true);
         }
-        body = new Stmt.While(condition,body);
+        body = new Stmt.While(condition, body);
 
-        if(initializer!=null){
-            body = new Stmt.Block([initializer,body]);
+        if (initializer != null)
+        {
+            body = new Stmt.Block([initializer, body]);
         }
         return body;
     }
@@ -163,6 +171,28 @@ public class Parser
         return new Stmt.Expression(expr);
     }
 
+    private Stmt.Function Function(string kind)
+    {
+        Token name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name");
+        Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+        List<Token> parameters = new List<Token>();
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (parameters.Count >= 255)
+                {
+                    Error(Peek(), "Can't have more than 255 parameters");
+                }
+                parameters.Add(Consume(TokenType.IDENTIFIER, "Expect paramter name."));
+            } while (Match(TokenType.COMMA));
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters");
+        Consume(TokenType.LEFT_BRACE,$"Expect {{ before {kind} body");
+        List<Stmt> body = Block();
+        return new Stmt.Function(name,parameters,body);
+    }
+
     private List<Stmt> Block()
     {
         List<Stmt> statements = new List<Stmt>();
@@ -188,7 +218,7 @@ public class Parser
                 Token name = ((Expr.Variable)expr).getName();
                 return new Expr.Assign(name, value);
             }
-            ErrorReporter.Error(equals, "Invalid Assignment target.");
+            Error(equals, "Invalid Assignment target.");
         }
         return expr;
     }
@@ -284,29 +314,38 @@ public class Parser
         return Call();
     }
 
-    private Expr Call(){
+    private Expr Call()
+    {
         Expr expr = Primary();
-        while(true){
-            if(Match(TokenType.LEFT_PAREN)){
+        while (true)
+        {
+            if (Match(TokenType.LEFT_PAREN))
+            {
                 expr = FinishCall(expr);
-            }else{
+            }
+            else
+            {
                 break;
             }
         }
         return expr;
     }
 
-    private Expr.Call FinishCall(Expr callee){
+    private Expr.Call FinishCall(Expr callee)
+    {
         List<Expr> arguments = new List<Expr>();
-        if(!Check(TokenType.RIGHT_PAREN)){
-            do{
-                if(arguments.Count>=255){
-                    ErrorReporter.Error(Peek(),"No more arguments than 255");
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (arguments.Count >= 255)
+                {
+                    Error(Peek(), "No more arguments than 255");
                 }
                 arguments.Add(Expression());
-            }while(Match(TokenType.COMMA));
+            } while (Match(TokenType.COMMA));
         }
-        Token paren = Consume(TokenType.RIGHT_PAREN,"Expect ')' after arguments.");
+        Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
         return new Expr.Call(callee, paren, arguments);
     }
 

@@ -1,3 +1,4 @@
-for(let i = 0; i<=100;i=i+2){
-  print i;
+fun sum(a,b) {
+  print a+b;
 }
+print sum;

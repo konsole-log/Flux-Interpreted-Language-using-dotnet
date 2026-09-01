@@ -1,4 +1,5 @@
 using Flux.Language.Lexer;
+using Flux.Language.Diagnostics;
 namespace Flux.Language.AST;
 
 public abstract class Expr {
