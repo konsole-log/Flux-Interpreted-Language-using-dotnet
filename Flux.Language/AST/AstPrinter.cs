@@ -20,6 +20,11 @@ public class AstPrinter : Expr.Visitor<string>, Stmt.Visitor<string>
 		return "";
 	}
 
+	public string VisitCallExpr(Expr.Call expr)
+	{
+		return "";
+	}
+
 	public string VisitAssignExpr(Expr.Assign expr)
 	{
 		return "";

@@ -1,5 +1,4 @@
 using Flux.Language.Lexer;
-using Flux.Language.Diagnostics;
 namespace Flux.Language.AST;
 
 public abstract class Expr {
@@ -8,6 +7,7 @@ public abstract class Expr {
 
 	public interface Visitor<T> {
 		public T VisitBinaryExpr(Binary expr);
+		public T VisitCallExpr(Call expr);
 		public T VisitAssignExpr(Assign expr);
 		public T VisitGroupingExpr(Grouping expr);
 		public T VisitLiteralExpr(Literal expr);
@@ -42,6 +42,35 @@ public abstract class Expr {
 
 		public override T Accept<T>(Visitor<T> visitor) {
 			return visitor.VisitBinaryExpr(this);
+		}
+	}
+
+	public class Call : Expr {
+
+		readonly Expr callee;
+		readonly Token paren;
+		readonly List<Expr> arguments;
+
+		public Expr getCallee() {
+			return callee;
+		}
+
+		public Token getParen() {
+			return paren;
+		}
+
+		public List<Expr> getArguments() {
+			return arguments;
+		}
+
+		public Call(Expr callee, Token paren, List<Expr> arguments) {
+			this.callee = callee;
+			this.paren = paren;
+			this.arguments = arguments;
+		}
+
+		public override T Accept<T>(Visitor<T> visitor) {
+			return visitor.VisitCallExpr(this);
 		}
 	}
 
