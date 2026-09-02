@@ -230,8 +230,8 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
     public Object? VisitCallExpr(Expr.Call expr)
     {
         Object? callee = Evaluate(expr.getCallee());
-        List<Object?> arguments = new List<Object?>();
-        foreach (Expr argument in arguments)
+        List<Object> arguments = new List<Object>();
+        foreach (Expr argument in expr.getArguments())
         {
             arguments.Add(Evaluate(argument));
         }
@@ -289,6 +289,13 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
         return null;
     }
 
+    public Object? VisitReturnStmt(Stmt.Return stmt){
+        Object? value = null;
+        if(stmt.getValue()!=null){
+            value = Evaluate(stmt.getValue());
+        }
+        throw new Return(value);
+    }
     public Object? VisitLetStmt(Stmt.Let stmt)
     {
         Object? value = null;
@@ -371,7 +378,7 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
         return a.Equals(b);
     }
 
-    private Object? Evaluate(Expr expr)
+    private Object? Evaluate(Expr? expr)
     {
         return expr.Accept(this);
     }

@@ -59,6 +59,9 @@ public class Parser
         {
             return PrintStatement();
         }
+        if(Match(TokenType.RETURN)){
+            return ReturnStatement();
+        }
         if (Match(TokenType.WHILE))
         {
             return WhileStatement();
@@ -141,6 +144,15 @@ public class Parser
         return new Stmt.Print(value);
     }
 
+    private Stmt.Return ReturnStatement(){
+        Token keyword = Previous();
+        Expr? value = null;
+        if(!Check(TokenType.SEMICOLON)){
+            value = Expression();
+        }
+        Consume(TokenType.SEMICOLON,"Expect ';' after return value.");
+        return new Stmt.Return(keyword,value);
+    }
     private Stmt.Let VarDeclaration()
     {
         Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");

@@ -80,6 +80,11 @@ public class AstPrinter : Expr.Visitor<string>, Stmt.Visitor<string>
 		return "";
 	}
 
+	public string VisitReturnStmt(Stmt.Return stmt)
+	{
+		return "";
+	}
+
 	public string VisitLetStmt(Stmt.Let stmt)
 	{
 		return "";

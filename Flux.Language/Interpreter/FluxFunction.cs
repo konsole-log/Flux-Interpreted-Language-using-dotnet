@@ -1,28 +1,40 @@
-using Flux.Language.Lexer;
-using Flux.Language.Diagnostics;
 using Flux.Language.AST;
+using Flux.Language.Diagnostics;
+using Flux.Language.Lexer;
+
 namespace Flux.Language.Interpreter;
 
-public class FluxFunction : FluxCallable{
-  private readonly Stmt.Function declaration;
-  public FluxFunction(Stmt.Function declaration){
-    this.declaration = declaration;
-  }
+public class FluxFunction : FluxCallable
+{
+    private readonly Stmt.Function declaration;
 
-  public Object? Call(Interpreter interpreter, List<Object?> arguments){
-    Env environment = new Env(interpreter.globals);
-    for(int i = 0; i < declaration.getParams().Count;i++){
-      environment.Define(declaration.getParams()[i].getLexeme(),arguments[i]);
+    public FluxFunction(Stmt.Function declaration)
+    {
+        this.declaration = declaration;
     }
-    interpreter.ExecuteBlock(declaration.getBody(),environment);
-    return null;
-  }
 
-  public int Arity(){
-    return declaration.getParams().Count;
-  }
+    public Object? Call(Interpreter interpreter, List<Object> arguments)
+    {
+        Env environment = new Env(interpreter.globals);
+        for (int i = 0; i < declaration.getParameters().Count; i++)
+        {
+            environment.Define(declaration.getParameters()[i].getLexeme(), arguments[i]);
+        }
+        try{
+            interpreter.ExecuteBlock(declaration.getBody(),environment);
+        }catch(Return returnValue){
+            return returnValue.getValue();
+        }
+        return null;
+    }
 
-    public override string ToString() {
+    public int Arity()
+    {
+        return declaration.getParameters().Count;
+    }
+
+    public override string ToString()
+    {
         return $"<fn {declaration.getName().getLexeme()} >";
     }
 }
