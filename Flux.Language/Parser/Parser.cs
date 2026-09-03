@@ -20,12 +20,16 @@ public class Parser
         List<Stmt> statements = new List<Stmt>();
         while (!IsAtEnd())
         {
-            statements.Add(Declaration());
+            Stmt? statement = Declaration();
+            if (statement != null)
+            {
+                statements.Add(statement);
+            }
         }
         return statements;
     }
 
-    private Stmt Declaration()
+    private Stmt? Declaration()
     {
         try
         {
@@ -59,7 +63,8 @@ public class Parser
         {
             return PrintStatement();
         }
-        if(Match(TokenType.RETURN)){
+        if (Match(TokenType.RETURN))
+        {
             return ReturnStatement();
         }
         if (Match(TokenType.WHILE))
@@ -144,15 +149,18 @@ public class Parser
         return new Stmt.Print(value);
     }
 
-    private Stmt.Return ReturnStatement(){
+    private Stmt.Return ReturnStatement()
+    {
         Token keyword = Previous();
         Expr? value = null;
-        if(!Check(TokenType.SEMICOLON)){
+        if (!Check(TokenType.SEMICOLON))
+        {
             value = Expression();
         }
-        Consume(TokenType.SEMICOLON,"Expect ';' after return value.");
-        return new Stmt.Return(keyword,value);
+        Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
+
     private Stmt.Let VarDeclaration()
     {
         Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
@@ -200,9 +208,9 @@ public class Parser
             } while (Match(TokenType.COMMA));
         }
         Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters");
-        Consume(TokenType.LEFT_BRACE,$"Expect {{ before {kind} body");
+        Consume(TokenType.LEFT_BRACE, $"Expect {{ before {kind} body");
         List<Stmt> body = Block();
-        return new Stmt.Function(name,parameters,body);
+        return new Stmt.Function(name, parameters, body);
     }
 
     private List<Stmt> Block()
@@ -210,7 +218,11 @@ public class Parser
         List<Stmt> statements = new List<Stmt>();
         while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
         {
-            statements.Add(Declaration());
+            Stmt? statement = Declaration();
+            if (statement != null)
+            {
+                statements.Add(statement);
+            }
         }
         Consume(TokenType.RIGHT_BRACE, $"Expect '}}' after block.");
         return statements;

@@ -3,9 +3,9 @@ namespace Flux.Language.Interpreter;
 internal class NativeFunction : FluxCallable
 {
     private int arity;
-    private readonly Func<object, object, double> funcnum;
-    private readonly Func<object, object, string?> funcstr;
-    private readonly Func<object, object, bool> funcbool;
+    private readonly Func<object, object, double>? funcnum;
+    private readonly Func<object, object, string?>? funcstr;
+    private readonly Func<object, object, bool>? funcbool;
 
     public NativeFunction(int arity, Func<object, object, double> func)
     {

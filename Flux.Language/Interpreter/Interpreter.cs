@@ -115,7 +115,7 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
         }
     }
 
-    private void Execute(Stmt stmt)
+    private void Execute(Stmt? stmt)
     {
         stmt.Accept(this);
     }
@@ -190,19 +190,19 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
                 return IsEqual(left, right);
             case TokenType.GREATER:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left > (double)right;
+                return (double?)left > (double?)right;
             case TokenType.GREATER_EQUAL:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left >= (double)right;
+                return (double?)left >= (double?)right;
             case TokenType.LESS:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left < (double)right;
+                return (double?)left < (double?)right;
             case TokenType.LESS_EQUAL:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left <= (double)right;
+                return (double?)left <= (double?)right;
             case TokenType.MINUS:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left - (double)right;
+                return (double?)left - (double?)right;
             case TokenType.PLUS:
                 if (left is double && right is double)
                 {
@@ -218,10 +218,10 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
                 );
             case TokenType.SLASH:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left / (double)right;
+                return (double?)left / (double?)right;
             case TokenType.STAR:
                 CheckNumberOperands(expr.getOpr(), left, right);
-                return (double)left * (double)right;
+                return (double?)left * (double?)right;
         }
 
         return null;
@@ -265,7 +265,7 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
                 return !IsTruthy(right);
             case TokenType.MINUS:
                 CheckNumberOperand(expr.getOpr(), right);
-                return -(double)right;
+                return -(double?)right;
         }
         return null;
     }
@@ -328,13 +328,13 @@ public class Interpreter : Expr.Visitor<Object?>, Stmt.Visitor<Object?>
         return value;
     }
 
-    public string Stringify(Object? obj)
+    public string? Stringify(Object? obj)
     {
         if (obj == null)
             return "nil";
         if (obj is double)
         {
-            string text = obj.ToString();
+            string? text = obj.ToString();
             if (text.EndsWith(".0"))
             {
                 text = text[0..(text.Length - 2)];

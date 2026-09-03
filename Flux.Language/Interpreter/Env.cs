@@ -42,7 +42,7 @@ public class Env
     }
 
     //Assign a value to the variable
-    public void Assign(Token name, Object value)
+    public void Assign(Token name, Object? value)
     {
         if (values.ContainsKey(name.getLexeme()))
         {

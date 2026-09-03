@@ -129,17 +129,17 @@ public abstract class Stmt {
 	public class Return : Stmt {
 
 		readonly Token keyword;
-		readonly Expr value;
+		readonly Expr? value;
 
 		public Token getKeyword() {
 			return keyword;
 		}
 
-		public Expr getValue() {
+		public Expr? getValue() {
 			return value;
 		}
 
-		public Return(Token keyword, Expr value) {
+		public Return(Token keyword, Expr? value) {
 			this.keyword = keyword;
 			this.value = value;
 		}
@@ -152,17 +152,17 @@ public abstract class Stmt {
 	public class Let : Stmt {
 
 		readonly Token name;
-		readonly Expr initializer;
+		readonly Expr? initializer;
 
 		public Token getName() {
 			return name;
 		}
 
-		public Expr getInitializer() {
+		public Expr? getInitializer() {
 			return initializer;
 		}
 
-		public Let(Token name, Expr initializer) {
+		public Let(Token name, Expr? initializer) {
 			this.name = name;
 			this.initializer = initializer;
 		}
