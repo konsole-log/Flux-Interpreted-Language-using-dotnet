@@ -9,7 +9,7 @@ public class Env
     private readonly Dictionary<string, Object?> values = new Dictionary<string, Object?>();
     //scope which is null for the global but has something for the local scope
     internal readonly Env? enclosing;
-
+    
     //this constructor is for the global scope variable
     public Env(){
       this.enclosing = null;
