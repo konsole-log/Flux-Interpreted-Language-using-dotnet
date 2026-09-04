@@ -1,6 +1,18 @@
-# Flux
+## Introduction
 
-A small interpreted language, written in C#/.NET.
+Flux is a small interpreted programming language written in C#/.NET.
+
+The project was created as a learning exercise to understand how programming
+languages are designed and constructed, how interpreters work, and how source
+code is processed from lexical analysis to execution.
+
+Flux is intentionally small and basic, but it is functional and includes
+features such as variables, expressions, control flow, functions, recursion,
+and a REPL.
+
+The implementation is heavily inspired by the book
+[*Crafting Interpreters*](https://craftinginterpreters.com/)
+by Robert Nystrom.
 
 ```
 func fib(n){
@@ -86,15 +98,31 @@ chmod +x flux
 sudo mv flux /usr/local/bin/
 ```
 
-**Windows**
-Unzip `flux-win-x64.zip` and put `flux.exe` somewhere on your PATH (e.g. `C:\tools`, then add that folder to PATH via System Properties → Environment Variables).
+**Windows**<br>
+Steps for Installation:
+1. Unzip `flux-win-x64.zip` and you should see `flux.exe`.
+2. Create a folder for command-line applications, for example:<br>
+`C:\tools`
+3. Move `flux.exe` into this folder
+4. Add `C:\tools` to your Windows PATH:
+- Press **Windows + S** and search for Environment Variables.
+- Select **Edit the system environment variables**.
+- Click **Environment Variables...**
+- Under **User variables**, select **Path** and click **Edit**.
+- Click **New** and enter: `C:\tools`
+- Click **OK** to save the changes.
+5. Close and reopen PowerShell, Command Prompt, or Windows Terminal so that the updated PATH is loaded.
+6. Verify that Flux is installed correctly: `flux`
 
-Either way, once it's on your PATH:
+## Usage
 
 ```
-flux test.flux
+flux                 # starts a REPL
+flux file.flux        # runs a file
+flux --tokens file.flux   # prints the token stream
+flux --ast file.flux      # prints the parsed AST
+flux --all file.flux      # prints tokens, AST, and output together
 ```
-
 ### Building the binaries yourself
 
 If you'd rather build from source than use a release, you only need the [.NET SDK](https://dotnet.microsoft.com/download) for this one-time step — people who just want to *run* Flux still don't need it.
@@ -115,15 +143,7 @@ If you just want to try it out without putting anything on your PATH:
 dotnet run --project Flux.CLI -- test.flux
 ```
 
-## Usage
 
-```
-flux                 # starts a REPL
-flux file.flux        # runs a file
-flux --tokens file.flux   # prints the token stream
-flux --ast file.flux      # prints the parsed AST
-flux --all file.flux      # prints tokens, AST, and output together
-```
 
 Only `.flux` files are accepted — anything else gets rejected with an error.
 
