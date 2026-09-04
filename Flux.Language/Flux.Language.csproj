@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>CS8602;CS0168</NoWarn>
+    
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 </Project>
