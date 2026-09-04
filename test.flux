@@ -6,3 +6,9 @@ func fib(n){
 for(let i=0;i<20;i=i+1){
   print fib(i);
 }
+
+func greet(name){
+  return "Hello" + name;
+}
+let name = input();
+print greet(name);

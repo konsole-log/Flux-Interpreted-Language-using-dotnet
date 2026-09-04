@@ -64,20 +64,15 @@ while (i < 5) {
 }
 ```
 
-**Functions and closures**
+**Functions**
 ```
-func makeCounter() {
-  let count = 0;
-  func increment() {
-    count = count + 1;
-    return count;
-  }
-  return increment;
+func greet(name){
+  return "Hello" + name;
 }
+let name = input();
+print greet(name);
 
-let counter = makeCounter();
-print counter(); // 1
-print counter(); // 2
+
 ```
 
 **Reading input**
