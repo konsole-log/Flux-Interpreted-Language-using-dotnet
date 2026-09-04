@@ -29,6 +29,7 @@ public class Lexer
         { "this", TokenType.THIS },
         { "let", TokenType.LET },
         { "while", TokenType.WHILE },
+        { "true", TokenType.TRUE},
     };
 
     public Lexer(string source)
