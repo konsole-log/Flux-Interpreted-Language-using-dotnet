@@ -15,7 +15,14 @@ public class ErrorReporter
     private static void Report(int line, string position, string message)
     {
         Console.ForegroundColor = ConsoleColor.DarkMagenta;
-        Console.Error.WriteLine($"[Line {line} Error {position} : {message}]");
+        if (line == 1)
+        {
+            Console.Error.WriteLine($"[Line 1 Error {position} : {message}]");
+        }
+        else
+        {
+            Console.Error.WriteLine($"[Line {line-1} Error {position} : {message}]");
+        }
         Console.ResetColor();
         hadError = true;
     }
